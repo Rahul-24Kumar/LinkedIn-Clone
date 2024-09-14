@@ -2,23 +2,24 @@ import User from "../models/user.model.js";
 import cloudinary from "../lib/cloudinary.js";
 
 export const getSuggestedConnections = async (req, res) => {
-  try {
-    const currentUser = await User.findById(req.user._id).select("connections");
+	try {
+		const currentUser = await User.findById(req.user._id).select("connections");
 
-    // find all users that are not in the current user's connections
+		// find users who are not already connected, and also do not recommend our own profile!! right?
+		const suggestedUser = await User.find({
+			_id: {
+				$ne: req.user._id,
+				$nin: currentUser.connections,
+			},
+		})
+			.select("name username profilePicture headline")
+			.limit(3);
 
-    const suggestedUser = await User.find({
-      _id: {
-        $ne: req.user._id,
-        $nin: currentUser.connections,
-      },
-    })
-      .select("name username profilePicture headline")
-      .limit(3);
-  } catch (error) {
-    console.log("Error in getSuggestedConnections: ", error.message);
-    res.status(500).json({ message: "Internal server error" });
-  }
+		res.json(suggestedUser);
+	} catch (error) {
+		console.error("Error in getSuggestedConnections controller:", error);
+		res.status(500).json({ message: "Server error" });
+	}
 };
 
 export const getPublicProfile = async (req, res) => {
