@@ -4,6 +4,7 @@ import Sidebar from "../components/Sidebar";
 import PostCreation from "../components/PostCreation";
 import { Users } from "lucide-react";
 import Post from "../components/Post";
+import RecommendedUser from "../components/RecommendedUser";
 
 const HomePage = () => {
   const { data: authUser } = useQuery({
@@ -33,7 +34,7 @@ const HomePage = () => {
       <div className="hidden lg:block lg:col-span-1">
         <Sidebar user={authUser} />
       </div>
-      <div className="lg:col-span-1 lg:col-span-2 order-first lg:order-none">
+      <div className="col-span-1 lg:col-span-2 order-first lg:order-none">
         <PostCreation user={authUser} />
 
         {posts?.map((post) => (
@@ -54,6 +55,16 @@ const HomePage = () => {
           </div>
         )}
       </div>
+      {recommendedUsers?.length > 0 && (
+        <div className="col-span-1 hidden lg:block lg:col-span-1">
+          <div className="bg-secondary rounded-lg shadow p-4">
+            <h2 className="font-semibold mb-4">People you may know</h2>
+            {recommendedUsers?.map((user) => (
+              <RecommendedUser key={user._id} user={user} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
